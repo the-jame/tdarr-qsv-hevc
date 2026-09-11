@@ -10,17 +10,17 @@ using Intel Quick Sync Video — Intel Arc GPUs or 8th-gen+ Core iGPUs.
 ## Why
 
 I couldn't find a Tdarr plugin that did Intel QSV HEVC transcoding the way I wanted:
-most were either too heavy, too generic, or didn't handle the details I care about —
-true full-GPU pipelines, correct 10-bit handling, safe skips for content QSV can't
-deal with, and preserving everything except the video stream. So I wrote my own.
+most were either too heavy, too generic, or didn't handle the specific details I care about
+like correct 10-bit handling,  skips for content QSV can't deal with, and preserving 
+everything except the video stream. So I wrote my own.
 
-It's deliberately opinionated: **one job, done well** — get a mixed library to
+It's deliberately specific: **one job, done well** — get a mixed library to
 consistent HEVC at your target resolution, without re-encoding things that don't
 need it.
 
 ## AI use disclosure
 
-AI tools were used to create this project — **Google Gemini** and **GLM**
+AI tools were used to create this project: **Google Gemini** and **GLM**
 assisted with generating the plugin code and writing this documentation.
 Everything has been reviewed and tested by me before release.
 
@@ -58,56 +58,52 @@ Everything has been reviewed and tested by me before release.
 
 ## Installation (local plugin)
 
-Because this plugin isn't in the official plugin hub, Tdarr loads it from the node's
-**local** plugins folder. Local plugins live on your machine, survive Tdarr updates,
-and are never overwritten by plugin-hub syncs.
+Because this plugin isn't in the official plugin hub, Tdarr loads it from thePlugins/Local
+folder of the Tdarr node's data. It's a three-step job: create the file, paste the code
+in, restart Tdarr.
 
-### 1. Download the plugin file
+### 1. Create the plugin file
 
-Download `Tdarr_Plugin_the_jame_QSV_HEVC_Standardizer.js` from this repo
-(**Code → Download ZIP**, or save the raw file directly). Make sure the filename
-stays exactly as-is — it must match the plugin id.
+Create an empty file named after the plugin id in:
 
-### 2. Find your Tdarr **node**'s Plugins folder
+```bash
+/home/<username>/docker/arr-stack/tdarr/server/Tdarr/Plugins/Local
+```
 
-The plugin runs on the **node** (the machine doing the transcoding), so the file
-goes there — not on the server if they're separate machines.
+```bash
+mkdir -p /home/<username>/docker/arr-stack/tdarr/server/Tdarr/Plugins/Local
+touch /home/<username>/docker/arr-stack/tdarr/server/Tdarr/Plugins/Local/Tdarr_Plugin_the_jame_QSV_HEVC_Standardizer.js
+```
 
-- **Native install:** look next to your Tdarr node's data folder for: "Tdarr/Plugins/local/"
+The filename must match the plugin id exactly — Tdarr registers local plugins by
+their filename.
 
-e.g. `C:\Tdarr\Plugins\local` on Windows or `/opt/Tdarr/Plugins/local` on Linux.
-Create the `local` folder if it doesn't exist.
-- **Docker:** the same folder is inside your mounted config volume — on the common
-images that's under `.../server/Tdarr/Plugins/local` on the host. Use
-`docker exec -it <container> sh` or a bind mount to place the file.
+### 2. Paste the plugin code in
 
-> Use the `local` folder, not `community`. The `community` folder is managed by
-> Tdarr's plugin-hub sync and can be overwritten.
+Copy the full contents of `Tdarr_Plugin_the_jame_QSV_HEVC_Standardizer.js` from this
+repo (**Code → Download ZIP**, or open the raw file and copy) and paste it into the
+file you just created. Save.
 
-### 3. Restart the Tdarr node
+> Keep it out of the `community` folder — that one is managed by Tdarr's plugin-hub
+> sync and can be overwritten.
 
-Restart from the **Nodes** page in the web UI, or restart the container/service.
-Plugins are only scanned at node startup.
+### 3. Restart Tdarr
 
-### 4. Verify it loaded
+Restart the container (or restart the node from the **Nodes** page). Plugins are
+only scanned at startup, so nothing shows up until Tdarr restarts. If your transcode
+nodes run on separate machines, place the same file in each node's Plugins/Local
+folder too.
 
-In the web UI, open the **Plugins** page and search for `the-jame` or `QSV`.
-You should see **the-jame QSV HEVC Standardizer (10-bit)** listed.
+### 4. Confirm it loaded
 
-### 5. Add it to your flow
-
-1. Open **Flows** and edit (or create) the flow attached to your library.
-2. Drag in a **Plugin** element and select
- *the-jame QSV HEVC Standardizer (10-bit)*.
-3. Configure the inputs (see below) and save the flow.
-
-(If you use the older stack-based libraries instead of flows: **Libraries → your
-library → Transcode options → Add plugin**, and pick it from the list.)
+In the web UI, open **Classic → Plugins → Local** — you should see
+**the-jame QSV HEVC Standardizer (10-bit)** listed. Add it to your flow
+(**Flows** → drag in a **Plugin** element → select it → configure the inputs below).
 
 ### Updating
 
-Overwrite the `.js` file with the new version, then restart the node again. Your
-configured inputs are kept, since the plugin id doesn't change.
+Paste the new code over the old and restart Tdarr again. Your configured inputs are
+kept, since the plugin id doesn't change.
 
 ## Configuration
 
@@ -133,3 +129,4 @@ ffmpeg -y -fflags +genpts -hwaccel qsv -hwaccel_output_format qsv \
 -preset:v:0 slow -look_ahead:v:0 1 -look_ahead_depth:v:0 40 -extbrc:v:0 1 \
 -filter:v:0 scale_qsv=w=1920:h=1080:format=p010le \
 -max_muxing_queue_size 9999 -f matroska "output.mkv"
+```
