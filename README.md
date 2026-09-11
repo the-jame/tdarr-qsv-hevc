@@ -68,19 +68,17 @@ It's a three-step job: create the file, paste the code in, restart Tdarr.
 
 The file goes in the node's `Tdarr/Plugins/Local/` folder — on Docker, that's inside
 whatever host folder you mapped to `/app/server`. With a bind mount like
-`- ${CONFIG_ROOT}/tdarr/server:/app/server`, the plugins folder on the host is
-`${CONFIG_ROOT}/tdarr/server/Tdarr/Plugins/Local`:
+`- yourpath/to/server:/app/server`, the plugins folder on the host is
+`yourpath/to/server/Tdarr/Plugins/Local`:
 
 ```bash
-mkdir -p ${CONFIG_ROOT}/tdarr/server/Tdarr/Plugins/Local
-touch ${CONFIG_ROOT}/tdarr/server/Tdarr/Plugins/Local/Tdarr_Plugin_the_jame_QSV_HEVC_Standardizer.js
+mkdir -p yourpath/to/server/Tdarr/Plugins/Local
+touch yourpath/to/server/Tdarr/Plugins/Local/Tdarr_Plugin_the_jame_QSV_HEVC_Standardizer.js
 ```
 
 The filename must match the plugin id exactly — Tdarr registers local plugins by
 their filename. (Native installs are the same idea: `Tdarr/Plugins/Local/` inside
-your Tdarr data directory. Alternatively, place the file via
-`docker exec -it <container> sh` using the in-container path
-`/app/server/Tdarr/Plugins/Local/`.)
+your Tdarr data directory.
 
 ### 2. Paste the plugin code in
 
