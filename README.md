@@ -18,6 +18,12 @@ It's deliberately opinionated: **one job, done well** — get a mixed library to
 consistent HEVC at your target resolution, without re-encoding things that don't
 need it.
 
+## AI use disclosure
+
+AI tools were used to create this project — **Google Gemini** and **GLM**
+assisted with generating the plugin code and writing this documentation.
+Everything has been reviewed and tested by me before release.
+
 ## Features
 
 - **Full-GPU pipeline** — QSV decode → (optional) QSV scale → QSV encode. No CPU round-trips.
