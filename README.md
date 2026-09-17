@@ -22,7 +22,7 @@ need it.
 
 AI tools were used to create this project: **Google Gemini** and **GLM**
 assisted with generating the plugin code and writing this documentation.
-Everything has been reviewed and tested by me before release.
+Everything has been reviewed and tested by me on over 25,000 files before release.
 
 ## Features
 
